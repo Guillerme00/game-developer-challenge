@@ -2,7 +2,7 @@ import { MenuPage } from "./pages/menu";
 
 function App() {
   return (
-    <main className="h-dvh w-full overflow-hidden">
+    <main className="min-h-dvh w-full overflow-x-hidden">
       <MenuPage />
     </main>
   );

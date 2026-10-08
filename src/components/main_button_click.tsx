@@ -3,15 +3,15 @@ import primaryButtonHover from "../../assets/png/retina/ui/menu/button_primary_h
 
 type MainButtonProps = {
   label: string;
-  onClick?: () => void;
+  click: () => void;
 };
 
-export const Secondary_Button = ({ label, onClick }: MainButtonProps) => {
+export const Main_Button_Click = ({ label, click }: MainButtonProps) => {
   return (
     <button
       type="button"
-      onClick={onClick}
-      className="group relative h-14 w-48 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+      className="group relative h-28 w-96 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+      onClick={() => click()}
     >
       <img
         src={primaryButton}
