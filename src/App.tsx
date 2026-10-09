@@ -1,9 +1,11 @@
-import { MenuPage } from "./pages/menu";
+import { Game } from "./pages/game";
+// import { MenuPage } from "./pages/menu";
 
 function App() {
   return (
     <main className="min-h-dvh w-full overflow-x-hidden">
-      <MenuPage />
+      {/* <MenuPage /> */}
+      <Game />
     </main>
   );
 }
