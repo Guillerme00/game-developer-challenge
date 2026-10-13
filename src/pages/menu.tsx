@@ -112,10 +112,7 @@ export const MenuPage = ({
             </li>
             <li className="flex flex-col items-center gap-2">
               <span className="text-sm font-semibold">Fire front</span>
-              <div className="flex gap-2">
-                <ControlKey label="R" />
-                <ControlMouse label="M1" description="Mouse button 1" />
-              </div>
+              <ControlMouse label="M1" description="Mouse button 1" />
             </li>
             <li className="flex flex-col items-center gap-2">
               <span className="text-sm font-semibold">Fire left</span>
@@ -135,7 +132,11 @@ export const MenuPage = ({
           enemySpawnIntervalSeconds={enemySpawnIntervalSeconds}
           onEnemySpawnIntervalChange={onEnemySpawnIntervalChange}
         />
-        <Ranking_Menu isOpen={isRankingOpen} onClose={toggleRanking} />
+        <Ranking_Menu
+          isOpen={isRankingOpen}
+          onClose={toggleRanking}
+          matches={matchHistory}
+        />
         <Match_History_Menu
           isOpen={isHistoryOpen}
           onClose={toggleHistory}
