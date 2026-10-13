@@ -1,4 +1,3 @@
-import { useState } from "react";
 import panelMenu from "../../assets/png/retina/ui/menu/panel_menu.png";
 import roundButton from "../../assets/png/retina/ui/controls/button_round_normal.png";
 import roundButtonHover from "../../assets/png/retina/ui/controls/button_round_hover.png";
@@ -29,6 +28,10 @@ type SettingStepperProps = {
 type OptionsProps = {
   isOpen: boolean;
   onClose: () => void;
+  sessionTimeSeconds: number;
+  onSessionTimeChange: (sessionTimeSeconds: number) => void;
+  enemySpawnIntervalSeconds: number;
+  onEnemySpawnIntervalChange: (intervalSeconds: number) => void;
 };
 
 const StepButton = ({ icon, label, onClick, disabled }: StepButtonProps) => (
@@ -100,12 +103,14 @@ const SettingStepper = ({
   );
 };
 
-export const Options_Menu = ({ isOpen, onClose }: OptionsProps) => {
-  const [sessionTimeSeconds, setSessionTimeSeconds] = useState(120);
-  const [spawnIntervalHalfSeconds, setSpawnIntervalHalfSeconds] = useState(8);
-
-  const spawnIntervalSeconds = spawnIntervalHalfSeconds / 2;
-
+export const Options_Menu = ({
+  isOpen,
+  onClose,
+  sessionTimeSeconds,
+  onSessionTimeChange,
+  enemySpawnIntervalSeconds,
+  onEnemySpawnIntervalChange,
+}: OptionsProps) => {
   return (
     <section
       aria-labelledby="options-menu-title"
@@ -125,27 +130,31 @@ export const Options_Menu = ({ isOpen, onClose }: OptionsProps) => {
         range="Range: 1-3 min"
         top="top-[27%]"
         onDecrease={() =>
-          setSessionTimeSeconds((current) => Math.max(60, current - 30))
+          onSessionTimeChange(Math.max(60, sessionTimeSeconds - 30))
         }
         onIncrease={() =>
-          setSessionTimeSeconds((current) => Math.min(180, current + 30))
+          onSessionTimeChange(Math.min(180, sessionTimeSeconds + 30))
         }
         decreaseDisabled={sessionTimeSeconds === 60}
         increaseDisabled={sessionTimeSeconds === 180}
       />
       <SettingStepper
         title="Enemy spawn interval"
-        value={`${spawnIntervalSeconds.toFixed(1)} s`}
+        value={`${enemySpawnIntervalSeconds.toFixed(1)} s`}
         range="Range: 3-10 s · Step: 0.5 s"
         top="top-[49%]"
         onDecrease={() =>
-          setSpawnIntervalHalfSeconds((current) => Math.max(6, current - 1))
+          onEnemySpawnIntervalChange(
+            Math.max(3, enemySpawnIntervalSeconds - 0.5),
+          )
         }
         onIncrease={() =>
-          setSpawnIntervalHalfSeconds((current) => Math.min(20, current + 1))
+          onEnemySpawnIntervalChange(
+            Math.min(10, enemySpawnIntervalSeconds + 0.5),
+          )
         }
-        decreaseDisabled={spawnIntervalHalfSeconds === 6}
-        increaseDisabled={spawnIntervalHalfSeconds === 20}
+        decreaseDisabled={enemySpawnIntervalSeconds === 3}
+        increaseDisabled={enemySpawnIntervalSeconds === 10}
       />
       <button
         type="button"
