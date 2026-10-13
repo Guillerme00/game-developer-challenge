@@ -1,21 +1,21 @@
 import panelMenu from "../../assets/png/retina/ui/menu/panel_menu.png";
 import primaryButton from "../../assets/png/retina/ui/menu/button_primary_normal.png";
 import primaryButtonHover from "../../assets/png/retina/ui/menu/button_primary_hover.png";
-
-const rankingEntries = [
-  { position: 1, player: "Player One", score: 284 },
-  { position: 2, player: "Player Two", score: 231 },
-  { position: 3, player: "Player Three", score: 198 },
-  { position: 4, player: "Player Four", score: 142 },
-  { position: 5, player: "Player Five", score: 96 },
-];
+import type { MatchHistoryEntry } from "../types/match_history";
 
 type RankingProps = {
   isOpen: boolean;
   onClose: () => void;
+  matches: MatchHistoryEntry[];
 };
 
-export const Ranking_Menu = ({ isOpen, onClose }: RankingProps) => {
+export const Ranking_Menu = ({ isOpen, onClose, matches }: RankingProps) => {
+  const rankingEntries = [...matches].sort(
+    (first, second) =>
+      second.score - first.score ||
+      Date.parse(second.dateTime) - Date.parse(first.dateTime),
+  );
+
   return (
     <section
       aria-labelledby="ranking-menu-title"
@@ -28,31 +28,44 @@ export const Ranking_Menu = ({ isOpen, onClose }: RankingProps) => {
       >
         Ranking
       </h2>
-      <div className="absolute inset-x-[12%] top-[27%] text-amber-100">
+      <div className="absolute inset-x-[9%] top-[27%] bottom-[22%] overflow-y-auto text-amber-100">
         <div className="grid grid-cols-[2.5rem_1fr_4rem] px-3 pb-2 text-xs font-bold uppercase tracking-wider text-amber-100/70">
           <span>#</span>
-          <span>Player</span>
+          <span>Match</span>
           <span className="text-right">Score</span>
         </div>
-        <ol aria-label="Top players" className="space-y-1">
-          {rankingEntries.map(({ position, player, score }) => (
-            <li
-              key={position}
-              className="grid grid-cols-[2.5rem_1fr_4rem] items-center rounded-sm border-b border-amber-100/15 bg-slate-950/20 px-3 py-2 text-sm"
-            >
-              <span
-                className={
-                  position <= 3
-                    ? "font-bold text-amber-300"
-                    : "text-amber-100/70"
-                }
-              >
-                {String(position).padStart(2, "0")}
-              </span>
-              <span className="truncate font-medium">{player}</span>
-              <span className="text-right font-bold tabular-nums">{score}</span>
+        <ol aria-label="Partidas ordenadas por pontuação" className="space-y-1">
+          {rankingEntries.length === 0 ? (
+            <li className="px-3 py-8 text-center text-sm text-amber-100/75">
+              No matches recorded yet.
             </li>
-          ))}
+          ) : (
+            rankingEntries.map((match, index) => (
+              <li
+                key={match.id}
+                className="grid grid-cols-[2.5rem_1fr_4rem] items-center rounded-sm border-b border-amber-100/15 bg-slate-950/20 px-3 py-2 text-sm"
+              >
+                <span
+                  className={
+                    index < 3
+                      ? "font-bold text-amber-300"
+                      : "text-amber-100/70"
+                  }
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <time
+                  dateTime={match.dateTime}
+                  className="truncate font-medium"
+                >
+                  {new Date(match.dateTime).toLocaleString()}
+                </time>
+                <span className="text-right font-bold tabular-nums">
+                  {match.score}
+                </span>
+              </li>
+            ))
+          )}
         </ol>
       </div>
       <button

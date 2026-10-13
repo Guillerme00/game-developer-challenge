@@ -2,13 +2,13 @@ import homeBackground from "../../assets/png/retina/ui/menu/home_background.png"
 import MenuPlay from "../../assets/png/retina/ui/menu/title_pirate_battle.png";
 import controlKeyBackground from "../../assets/png/retina/ui/menu/button_primary_normal.png";
 
-import { Main_Button } from "../components/main_button";
 import { Secondary_Button } from "../components/secondary_button";
 import { Options_Menu } from "../components/options_menu";
 import { useState } from "react";
 import { Main_Button_Click } from "../components/main_button_click";
 import { Ranking_Menu } from "../components/Ranking_menu";
 import { Match_History_Menu } from "../components/match_history_menu";
+import type { MatchHistoryEntry } from "../types/match_history";
 
 const ControlKey = ({ label }: { label: string }) => (
   <kbd className="relative grid h-10 w-10 shrink-0 place-items-center font-mono text-sm font-bold text-slate-950">
@@ -46,7 +46,23 @@ const ControlMouse = ({
   </span>
 );
 
-export const MenuPage = () => {
+type MenuPageProps = {
+  onPlay: () => void;
+  sessionTimeSeconds: number;
+  onSessionTimeChange: (sessionTimeSeconds: number) => void;
+  enemySpawnIntervalSeconds: number;
+  onEnemySpawnIntervalChange: (intervalSeconds: number) => void;
+  matchHistory: MatchHistoryEntry[];
+};
+
+export const MenuPage = ({
+  onPlay,
+  sessionTimeSeconds,
+  onSessionTimeChange,
+  enemySpawnIntervalSeconds,
+  onEnemySpawnIntervalChange,
+  matchHistory,
+}: MenuPageProps) => {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const [isRankingOpen, setIsRankingOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -71,7 +87,7 @@ export const MenuPage = () => {
       {/* Menu */}
       <div className="flex flex-col items-center justify-center gap-[8px]">
         <img src={MenuPlay} alt="pirate battle menu logo" />
-        <Main_Button label="Play" />
+        <Main_Button_Click label="Play" click={onPlay} />
         <Main_Button_Click label="Options" click={toggleOptions} />
         {/* Ranking e Match History */}
         <div>
@@ -85,13 +101,9 @@ export const MenuPage = () => {
           <ul className="mt-3 grid grid-cols-1 items-end gap-4 text-center md:grid-cols-2 lg:grid-cols-5">
             <li className="flex flex-col items-center gap-2">
               <span className="text-sm font-semibold">Move</span>
-              <div className="grid grid-cols-3 gap-1">
-                <span />
+              <div className="flex flex-col gap-1">
                 <ControlKey label="W" />
-                <span />
-                <ControlKey label="A" />
                 <ControlKey label="S" />
-                <ControlKey label="D" />
               </div>
             </li>
             <li className="flex flex-col items-center gap-2">
@@ -100,10 +112,7 @@ export const MenuPage = () => {
             </li>
             <li className="flex flex-col items-center gap-2">
               <span className="text-sm font-semibold">Fire front</span>
-              <div className="flex gap-2">
-                <ControlKey label="R" />
-                <ControlMouse label="M1" description="Mouse button 1" />
-              </div>
+              <ControlMouse label="M1" description="Mouse button 1" />
             </li>
             <li className="flex flex-col items-center gap-2">
               <span className="text-sm font-semibold">Fire left</span>
@@ -115,9 +124,24 @@ export const MenuPage = () => {
             </li>
           </ul>
         </section>
-        <Options_Menu isOpen={isOptionsOpen} onClose={closeOptions} />
-        <Ranking_Menu isOpen={isRankingOpen} onClose={toggleRanking} />
-        <Match_History_Menu isOpen={isHistoryOpen} onClose={toggleHistory} />
+        <Options_Menu
+          isOpen={isOptionsOpen}
+          onClose={closeOptions}
+          sessionTimeSeconds={sessionTimeSeconds}
+          onSessionTimeChange={onSessionTimeChange}
+          enemySpawnIntervalSeconds={enemySpawnIntervalSeconds}
+          onEnemySpawnIntervalChange={onEnemySpawnIntervalChange}
+        />
+        <Ranking_Menu
+          isOpen={isRankingOpen}
+          onClose={toggleRanking}
+          matches={matchHistory}
+        />
+        <Match_History_Menu
+          isOpen={isHistoryOpen}
+          onClose={toggleHistory}
+          matches={matchHistory}
+        />
       </div>
     </div>
   );

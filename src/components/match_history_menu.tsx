@@ -1,65 +1,36 @@
 import panelMenu from "../../assets/png/retina/ui/menu/panel_menu.png";
 import primaryButton from "../../assets/png/retina/ui/menu/button_primary_normal.png";
 import primaryButtonHover from "../../assets/png/retina/ui/menu/button_primary_hover.png";
-
-type MatchHistoryEntry = {
-  id: string;
-  dateTime: string;
-  dateLabel: string;
-  score: number;
-  duration: string;
-  result: "TIME UP" | "DEFEATED";
-};
+import type { MatchHistoryEntry } from "../types/match_history";
 
 type MatchHistoryProps = {
   isOpen: boolean;
   onClose: () => void;
+  matches: MatchHistoryEntry[];
 };
 
-const matchHistory: MatchHistoryEntry[] = [
-  {
-    id: "match-1",
-    dateTime: "2026-10-08T19:36:00",
-    dateLabel: "08 OCT / 19:36",
-    score: 24,
-    duration: "02:00",
-    result: "TIME UP",
-  },
-  {
-    id: "match-2",
-    dateTime: "2026-10-08T19:28:00",
-    dateLabel: "08 OCT / 19:28",
-    score: 18,
-    duration: "01:42",
-    result: "DEFEATED",
-  },
-  {
-    id: "match-3",
-    dateTime: "2026-10-08T19:20:00",
-    dateLabel: "08 OCT / 19:20",
-    score: 22,
-    duration: "02:00",
-    result: "TIME UP",
-  },
-  {
-    id: "match-4",
-    dateTime: "2026-10-08T19:12:00",
-    dateLabel: "08 OCT / 19:12",
-    score: 11,
-    duration: "01:18",
-    result: "DEFEATED",
-  },
-  {
-    id: "match-5",
-    dateTime: "2026-10-07T22:05:00",
-    dateLabel: "07 OCT / 22:05",
-    score: 20,
-    duration: "02:00",
-    result: "TIME UP",
-  },
-];
+const formatDuration = (durationSeconds: number) => {
+  const minutes = Math.floor(durationSeconds / 60);
+  const seconds = durationSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+};
 
-export const Match_History_Menu = ({ isOpen, onClose }: MatchHistoryProps) => {
+const getEndReasonLabel = (endReason: MatchHistoryEntry["endReason"]) => {
+  switch (endReason) {
+    case "time-expired":
+      return "Time ended";
+    case "ship-destroyed":
+      return "Ship destroyed";
+    case "returned-to-menu":
+      return "Left match";
+  }
+};
+
+export const Match_History_Menu = ({
+  isOpen,
+  onClose,
+  matches,
+}: MatchHistoryProps) => {
   return (
     <section
       aria-labelledby="match-history-title"
@@ -75,7 +46,7 @@ export const Match_History_Menu = ({ isOpen, onClose }: MatchHistoryProps) => {
       <p className="absolute inset-x-0 top-[23%] text-center text-xs font-semibold uppercase tracking-wider text-amber-100/70">
         Your recent battles
       </p>
-      <div className="absolute inset-x-[9%] top-[29%] text-amber-100">
+      <div className="absolute inset-x-[9%] top-[29%] bottom-[22%] overflow-y-auto text-amber-100">
         <table className="w-full table-fixed border-separate border-spacing-y-1 text-left">
           <thead className="text-[9px] font-bold uppercase tracking-wider text-amber-100/65 sm:text-[10px]">
             <tr>
@@ -94,46 +65,37 @@ export const Match_History_Menu = ({ isOpen, onClose }: MatchHistoryProps) => {
             </tr>
           </thead>
           <tbody className="text-[10px] sm:text-xs">
-            {matchHistory.map((match, index) => (
-              <tr
-                key={match.id}
-                className={index === 0 ? "bg-amber-300/20" : "bg-slate-950/45"}
-              >
-                <td className="rounded-l px-2 py-2 font-medium">
-                  <time dateTime={match.dateTime}>{match.dateLabel}</time>
-                </td>
-                <td className="px-1 py-2 text-right font-bold tabular-nums text-amber-300">
-                  {match.score}
-                </td>
-                <td className="px-1 py-2 text-right font-medium tabular-nums">
-                  {match.duration}
-                </td>
+            {matches.length === 0 ? (
+              <tr>
                 <td
-                  className={`rounded-r px-2 py-2 text-right text-[9px] font-bold sm:text-[10px] ${match.result === "TIME UP" ? "text-emerald-200" : "text-rose-200"}`}
+                  colSpan={4}
+                  className="px-2 py-8 text-center text-sm text-amber-100/75"
                 >
-                  {match.result}
+                  No matches recorded yet.
                 </td>
               </tr>
-            ))}
+            ) : (
+              matches.map((match) => (
+                <tr key={match.id} className="bg-slate-950/45">
+                  <td className="rounded-l px-2 py-2 font-medium">
+                    <time dateTime={match.dateTime}>
+                      {new Date(match.dateTime).toLocaleString()}
+                    </time>
+                  </td>
+                  <td className="px-1 py-2 text-right font-bold tabular-nums text-amber-300">
+                    {match.score}
+                  </td>
+                  <td className="px-1 py-2 text-right font-medium tabular-nums">
+                    {formatDuration(match.durationSeconds)}
+                  </td>
+                  <td className="rounded-r px-2 py-2 text-right text-[9px] font-bold sm:text-[10px]">
+                    {getEndReasonLabel(match.endReason)}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
-      </div>
-      <div className="absolute inset-x-0 top-[68%] flex items-center justify-center gap-4 text-xs font-bold uppercase tracking-wider text-amber-100/80">
-        <button
-          type="button"
-          aria-label="Previous page"
-          className="grid size-8 place-items-center rounded-full border border-amber-300/50 bg-amber-300/10 text-lg text-amber-200"
-        >
-          &lt;
-        </button>
-        <span>Page 1 of 2</span>
-        <button
-          type="button"
-          aria-label="Next page"
-          className="grid size-8 place-items-center rounded-full border border-amber-300/50 bg-amber-300/10 text-lg text-amber-200"
-        >
-          &gt;
-        </button>
       </div>
       <button
         type="button"
